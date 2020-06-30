@@ -1,0 +1,83 @@
+create database db_201310805;
+
+use db_201310805;
+
+set Global local_infile=1;
+
+create table users(
+
+User_id int(4) primary key,
+Age int(3),
+Gender varchar(2),
+Occupation varchar(15),
+Zip_code varchar(5) not null
+
+);
+
+create table movie(
+
+Movie_id int(5) primary key,
+Movie_title varchar(100) not null,
+Release_date varchar(15),
+IMDb_URL varchar(200)
+
+);
+
+create table movie_genre(
+
+Movie_id int(10) not null,
+Genre varchar(100),
+
+foreign key(Movie_id) references movie(Movie_id) ON DELETE CASCADE
+
+);
+
+create table datas(
+
+User_id int(10),
+Movie_id int(10), 
+Rating int(3),
+time_stamp int(10),
+
+PRIMARY KEY (User_id, Movie_id),
+FOREIGN KEY(User_id) references users(User_id)
+ON UPDATE Cascade
+ON DELETE CASCADE,
+FOREIGN KEY(Movie_id) references movie(Movie_id)
+ON UPDATE cascade
+ON DELETE CASCADE
+
+);
+
+
+select * from users;
+select * from datas;
+select * from movie;
+select * from movie_genre;
+
+select count(*) from datas;
+select count(*) from movie_genre;
+select count(*) from movie;
+select count(*) from users;
+
+SELECT d.Movie_id, m.Movie_title, g.Genre, AVG(d.Rating), COUNT(d.User_id)
+FROM datas d
+JOIN movie m ON d.Movie_id = m.Movie_id
+JOIN movie_genre g ON m.Movie_id = g.Movie_id
+JOIN users u ON d.User_id = u.User_id
+GROUP BY d.Movie_id
+ORDER BY (count(d.User_id)) DESC;
+
+
+
+SELECT d.Movie_id, m.Movie_title, g.Genre, AVG(d.Rating), COUNT(d.User_id)
+    FROM datas d
+    JOIN movie m ON d.Movie_id = m.Movie_id
+    JOIN movie_genre g ON m.Movie_id = g.Movie_id
+    JOIN users u ON d.User_id = u.User_id
+    
+and g.Genre = 'drama'
+and u.occupation='doctor'
+group by d.Movie_id
+having AVG(d.rating)>=1 and AVG(d.rating)<=4
+order by count(d.User_id) desc
